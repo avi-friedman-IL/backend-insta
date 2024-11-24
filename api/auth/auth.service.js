@@ -1,12 +1,12 @@
+import dotenv from 'dotenv'
+dotenv.config()
 import Cryptr from 'cryptr'
 import bcrypt from 'bcrypt'
-import dotenv from 'dotenv'
 import { OAuth2Client } from 'google-auth-library'
 
 import { userService } from '../user/user.service.js'
 import { logger } from '../../services/logger.service.js'
 
-dotenv.config()
 
 if (!process.env.GOOGLE_CLIENT_ID || !process.env.SECRET_KEY) {
    throw new Error('Cryptr: secret must be a non-0-length string');
