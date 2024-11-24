@@ -8,7 +8,7 @@ import { logger } from '../../services/logger.service.js'
 
 dotenv.config()
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
-const cryptr = new Cryptr(process.env.SECRET1)
+const cryptr = new Cryptr(process.env.SECRET_KEY)
 
 export const authService = {
    signup,
