@@ -7,6 +7,11 @@ import { userService } from '../user/user.service.js'
 import { logger } from '../../services/logger.service.js'
 
 dotenv.config()
+
+if (!process.env.GOOGLE_CLIENT_ID || !process.env.SECRET_KEY) {
+   throw new Error('Cryptr: secret must be a non-0-length string');
+}
+
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 const cryptr = new Cryptr(process.env.SECRET_KEY)
 
