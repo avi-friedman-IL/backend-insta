@@ -5,8 +5,8 @@
     "main": "server.js",
     "type": "module",
     "scripts": {
-         "start": "dotenv -e .env nodemon server",
-        "dev": "nodemon server.js",
+        "start": "dotenv -e .env nodemon server",
+        "dev": "dotenv -e .env nodemon server",
         "server:prod": "set NODE_ENV=production&&node server.js",
         "server:prod:mac": "export NODE_ENV=production && node server.js"
     },
