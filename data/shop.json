@@ -1,0 +1,51 @@
+[
+    {
+      "id": 1,
+      "name": "Wireless Headphones",
+      "image_url": "https://images.unsplash.com/photo-1519677100203-a0e668c92439",
+      "price": 59.99
+    },
+    {
+      "id": 2,
+      "name": "Smartphone",
+      "image_url": "https://images.unsplash.com/photo-1512499617640-c2f999a60713",
+      "price": 499.99
+    },
+    {
+      "id": 3,
+      "name": "4K TV",
+      "image_url": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2",
+      "price": 799.99
+    },
+    {
+      "id": 4,
+      "name": "Smartwatch",
+      "image_url": "https://images.unsplash.com/photo-1517430816045-df4b7de01f17",
+      "price": 199.99
+    },
+    {
+      "id": 5,
+      "name": "Gaming Laptop",
+      "image_url": "https://images.unsplash.com/photo-1517336714731-489689fd1ca8",
+      "price": 1199.99
+    },
+    {
+      "id": 6,
+      "name": "Bluetooth Speaker",
+      "image_url": "https://images.unsplash.com/photo-1495733715281-025e5d55b2e1",
+      "price": 89.99
+    },
+    {
+      "id": 7,
+      "name": "Digital Camera",
+      "image_url": "https://images.unsplash.com/photo-1519183071298-a2962f29a323",
+      "price": 329.99
+    },
+    {
+      "id": 8,
+      "name": "Tablet",
+      "image_url": "https://images.unsplash.com/photo-1510557880182-3b367a9e1e26",
+      "price": 299.99
+    }
+  ]
+  
