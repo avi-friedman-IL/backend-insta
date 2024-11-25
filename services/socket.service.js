@@ -19,10 +19,10 @@ export function setupSocketAPI(http) {
          // console.log(`Socket disconnected [id: ${socket.id}]`)
       })
 
-      socket.on('chat-add', chat => {
-         console.log('chat', chat)
+      // socket.on('chat-add', chat => {
+      //    console.log('chat', chat)
         
-      })
+      // })
 
       // Join a specific board (room)
       // socket.on('joinBoard', ({ boardId, currUser }) => {

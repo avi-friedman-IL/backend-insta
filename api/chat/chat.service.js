@@ -44,8 +44,9 @@ async function add(chat) {
       socketService.broadcast({
          type: 'chat-add',
          data: chat,
-         
+         userId: chat.toUserId,
       })
+      
       return chat
    } catch (err) {
       logger.error('cannot insert chat', err)
