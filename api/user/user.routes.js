@@ -5,7 +5,7 @@ import {
    requireAdmin,
    requireOwner,
 } from '../../middlewares/requireAuth.middleware.js'
-import { getUser, getUsers, deleteUser, updateUser } from './user.controller.js'
+import { getUser, getUsers, deleteUser, updateUser, updateTyping } from './user.controller.js'
 
 export const userRoutes = express.Router()
 
@@ -15,6 +15,7 @@ export const userRoutes = express.Router()
 userRoutes.get('/', getUsers)
 userRoutes.get('/:id', getUser)
 userRoutes.put('/:id', updateUser)
+userRoutes.post('/typing', updateTyping)
 
 // userRoutes.put('/:id',  requireAuth, updateUser)
 userRoutes.delete('/:id', requireAuth, requireAdmin, deleteUser)

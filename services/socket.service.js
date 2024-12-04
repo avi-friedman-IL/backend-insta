@@ -19,9 +19,17 @@ export function setupSocketAPI(http) {
          // console.log(`Socket disconnected [id: ${socket.id}]`)
       })
 
+      socket.on('typing', ({ toUserId, fromUserId }) => {
+         gIo.emit('typing', { toUserId, fromUserId })
+      })
+
+      socket.on('offTyping', () => {
+         gIo.emit('offTyping')
+      })
+
       // socket.on('chat-add', chat => {
       //    console.log('chat', chat)
-        
+
       // })
 
       // Join a specific board (room)
@@ -46,66 +54,66 @@ export function setupSocketAPI(http) {
       // })
 
       // Handle mouse movement event
-   //    socket.on('mouseMove', mouseData => {
-   //       const { boardId, x, y } = mouseData
-   //       const cursorData = { id: socket.id, fullname: socket.fullname, x, y }
+      //    socket.on('mouseMove', mouseData => {
+      //       const { boardId, x, y } = mouseData
+      //       const cursorData = { id: socket.id, fullname: socket.fullname, x, y }
 
-   //       broadcast({
-   //          type: 'mouseMove',
-   //          data: cursorData,
-   //          userId: socket.id,
-   //          room: boardId,
-   //       })
-   //    })
+      //       broadcast({
+      //          type: 'mouseMove',
+      //          data: cursorData,
+      //          userId: socket.id,
+      //          room: boardId,
+      //       })
+      //    })
 
-   //    // Set user ID for the socket
-   //    socket.on('set-user-socket', userId => {
-   //       console.log(
-   //          `Setting socket.userId = ${userId} for socket [id: ${socket.id}]`
-   //       )
-   //       socket.userId = userId
-   //    })
+      //    // Set user ID for the socket
+      //    socket.on('set-user-socket', userId => {
+      //       console.log(
+      //          `Setting socket.userId = ${userId} for socket [id: ${socket.id}]`
+      //       )
+      //       socket.userId = userId
+      //    })
 
-   //    // Get all connected users
-   //    socket.on('get-connected-users', async () => {
-   //       const connectedUsers = await _getAllSockets()
-   //       const userIds = connectedUsers.map(s => s.userId || null)
-   //       socket.emit('connected-users', userIds)
-   //    })
+      //    // Get all connected users
+      //    socket.on('get-connected-users', async () => {
+      //       const connectedUsers = await _getAllSockets()
+      //       const userIds = connectedUsers.map(s => s.userId || null)
+      //       socket.emit('connected-users', userIds)
+      //    })
 
-   //    // Chat functionalities
-   //    socket.on('chat-set-topic', topic => {
-   //       if (socket.myTopic === topic) return
-   //       if (socket.myTopic) {
-   //          socket.leave(socket.myTopic)
-   //          logger.info(
-   //             `Socket is leaving topic ${socket.myTopic} [id: ${socket.id}]`
-   //          )
-   //       }
-   //       socket.join(topic)
-   //       socket.myTopic = topic
-   //    })
+      //    // Chat functionalities
+      //    socket.on('chat-set-topic', topic => {
+      //       if (socket.myTopic === topic) return
+      //       if (socket.myTopic) {
+      //          socket.leave(socket.myTopic)
+      //          logger.info(
+      //             `Socket is leaving topic ${socket.myTopic} [id: ${socket.id}]`
+      //          )
+      //       }
+      //       socket.join(topic)
+      //       socket.myTopic = topic
+      //    })
 
-   //    socket.on('chat-send-msg', msg => {
-   //       logger.info(
-   //          `New chat msg from socket [id: ${socket.id}], emitting to topic ${socket.myTopic}`
-   //       )
-   //       gIo.to(socket.myTopic).emit('chat-add-msg', msg)
-   //    })
+      //    socket.on('chat-send-msg', msg => {
+      //       logger.info(
+      //          `New chat msg from socket [id: ${socket.id}], emitting to topic ${socket.myTopic}`
+      //       )
+      //       gIo.to(socket.myTopic).emit('chat-add-msg', msg)
+      //    })
 
-   //    // Watch user events
-   //    socket.on('user-watch', userId => {
-   //       logger.info(
-   //          `user-watch from socket [id: ${socket.id}], on user ${userId}`
-   //       )
-   //       socket.join('watching:' + userId)
-   //    })
+      //    // Watch user events
+      //    socket.on('user-watch', userId => {
+      //       logger.info(
+      //          `user-watch from socket [id: ${socket.id}], on user ${userId}`
+      //       )
+      //       socket.join('watching:' + userId)
+      //    })
 
-   //    // Unset user ID from the socket
-   //    socket.on('unset-user-socket', () => {
-   //       logger.info(`Removing socket.userId for socket [id: ${socket.id}]`)
-   //       delete socket.userId
-   //    })
+      //    // Unset user ID from the socket
+      //    socket.on('unset-user-socket', () => {
+      //       logger.info(`Removing socket.userId for socket [id: ${socket.id}]`)
+      //       delete socket.userId
+      //    })
    })
 }
 
