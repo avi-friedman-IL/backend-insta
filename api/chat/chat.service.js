@@ -73,6 +73,11 @@ async function update(chat) {
          { _id: ObjectId.createFromHexString(chat._id) },
          { $set: chatToSave }
       )
+      socketService.broadcast({
+         type: 'chat-update',
+         data: chat,
+         userId: chat.toUserId,
+      })
       return chat
    } catch (err) {
       logger.error('cannot update chat', err)
