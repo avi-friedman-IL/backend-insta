@@ -44,8 +44,14 @@ async function add(chat) {
       socketService.broadcast({
          type: 'chat-add',
          data: chat,
-         userId: chat.fromUserId,
+         userId: chat.toUserId,
       })
+      // socketService.emitToUser( {
+      //    type: 'chat-add',
+      //    data: chat,
+      //    userId: chat.toUserId,
+      // })
+
       
       return chat
    } catch (err) {
