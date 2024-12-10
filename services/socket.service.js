@@ -27,6 +27,11 @@ export function setupSocketAPI(http) {
          gIo.emit('offTyping')
       })
 
+      socket.on('login', (userId) => {
+         socket.userId = userId
+         gIo.emit('login', userId)
+      })
+
       // socket.on('chat-add', chat => {
       //    console.log('chat', chat)
 
