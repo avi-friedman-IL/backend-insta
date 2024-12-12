@@ -82,7 +82,7 @@ async function update(chat) {
       socketService.broadcast({
          type: 'chat-update',
          data: chat,
-         userId: chat.toUserId,
+         userId: chat.fromUserId,
       })
       return chat
    } catch (err) {
