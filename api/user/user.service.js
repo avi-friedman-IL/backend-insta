@@ -137,7 +137,7 @@ async function updateTyping(typing) {
       setTimeout(async () => {
          await collection.deleteOne({ _id: typing._id })
          return typing
-      }, 10000)
+      }, 5000)
       return typing
    } catch (err) {
       logger.error(`cannot update typing ${typing._id}`, err)
