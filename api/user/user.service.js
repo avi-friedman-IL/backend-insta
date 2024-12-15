@@ -131,16 +131,16 @@ function _buildCriteria(filterBy) {
 }
 
 async function updateTyping(typing) {
-   try {
-      const collection = await dbService.getCollection('typing')
-      await collection.insertOne(typing)
-      setTimeout(async () => {
-         await collection.deleteOne({ _id: typing._id })
-         return typing
-      }, 5000)
-      return typing
-   } catch (err) {
-      logger.error(`cannot update typing ${typing._id}`, err)
-      throw err
-   }
+   // try {
+   //    const collection = await dbService.getCollection('typing')
+   //    await collection.insertOne(typing)
+   //    setTimeout(async () => {
+   //       await collection.deleteOne({ _id: typing._id })
+   //       return typing
+   //    }, 5000)
+   //    return typing
+   // } catch (err) {
+   //    logger.error(`cannot update typing ${typing._id}`, err)
+   //    throw err
+   // }
 }
