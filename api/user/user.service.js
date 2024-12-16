@@ -10,7 +10,6 @@ export const userService = {
    remove,
    update,
    add,
-   updateTyping,
 }
 
 async function query(filterBy = {}) {
@@ -128,19 +127,4 @@ function _buildCriteria(filterBy) {
       criteria.balance = { $gte: filterBy.minBalance }
    }
    return criteria
-}
-
-async function updateTyping(typing) {
-   // try {
-   //    const collection = await dbService.getCollection('typing')
-   //    await collection.insertOne(typing)
-   //    setTimeout(async () => {
-   //       await collection.deleteOne({ _id: typing._id })
-   //       return typing
-   //    }, 5000)
-   //    return typing
-   // } catch (err) {
-   //    logger.error(`cannot update typing ${typing._id}`, err)
-   //    throw err
-   // }
 }

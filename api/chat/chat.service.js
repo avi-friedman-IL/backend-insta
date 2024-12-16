@@ -46,13 +46,7 @@ async function add(chat) {
          data: chat,
          userId: chat.fromUserId,
       })
-      // socketService.emitToUser( {
-      //    type: 'chat-add',
-      //    data: chat,
-      //    userId: chat.toUserId,
-      // })
 
-      
       return chat
    } catch (err) {
       logger.error('cannot insert chat', err)
@@ -125,8 +119,6 @@ function _buildCriteria(filterBy) {
          $or: [
             { toUserId, fromUserId },
             { toUserId: fromUserId, fromUserId: toUserId },
-            // { toUserId: toUserId, fromUserId: toUserId },
-            // { toUserId: fromUserId, fromUserId: fromUserId },
          ],
       }
    }
