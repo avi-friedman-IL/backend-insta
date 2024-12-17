@@ -58,6 +58,7 @@ async function remove(chatId) {
    try {
       const collection = await dbService.getCollection('chat')
       await collection.deleteOne({ _id: ObjectId.createFromHexString(chatId) })
+      socketService.broadcast({ type: 'chat-remove', data: chatId })
    } catch (err) {
       logger.error(`cannot remove chat ${chatId}`, err)
       throw err
