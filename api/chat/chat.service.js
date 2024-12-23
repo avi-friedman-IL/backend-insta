@@ -41,11 +41,11 @@ async function add(chat) {
    try {
       const collection = await dbService.getCollection('chat')
       await collection.insertOne(chat)
-      socketService.broadcast({
-         type: 'chat-add',
-         data: chat,
-         userId: chat.fromUserId,
-      })
+      // socketService.broadcast({
+      //    type: 'chat-add',
+      //    data: chat,
+      //    userId: chat.fromUserId,
+      // })
 
       return chat
    } catch (err) {

@@ -1,3 +1,4 @@
+import { chatService } from '../api/chat/chat.service.js'
 import { logger } from './logger.service.js'
 import { Server } from 'socket.io'
 
@@ -31,6 +32,12 @@ export function setupSocketAPI(http) {
          socket.userId = userId
          gIo.emit('login', userId)
       })
+
+      socket.on('chat-add', (chat) => {
+         chatService.add(chat)
+         gIo.emit('chat-add', chat)
+      })
+
 
       // socket.on('chat-add', chat => {
       //    console.log('chat', chat)
