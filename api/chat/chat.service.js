@@ -114,7 +114,7 @@ async function aggregation(toUserId) {
 }
 
 function _buildCriteria(filterBy) {
-   const { toUserId, fromUserId } = filterBy
+   const { toUserId, fromUserId, toGroupId } = filterBy
    if (toUserId) {
       return {
          $or: [
@@ -122,6 +122,9 @@ function _buildCriteria(filterBy) {
             { toUserId: fromUserId, fromUserId: toUserId },
          ],
       }
+   }
+   if (toGroupId) {
+      return { toGroupId }
    }
    const criteria = {}
    return criteria

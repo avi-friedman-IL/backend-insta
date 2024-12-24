@@ -20,24 +20,23 @@ export function setupSocketAPI(http) {
          // console.log(`Socket disconnected [id: ${socket.id}]`)
       })
 
-      socket.on('typing', ({ toUserId, fromUserId }) => {
-         gIo.emit('typing', { toUserId, fromUserId })
+      socket.on('typing', ({ toUserId, fromUserId, toGroupId }) => {
+         gIo.emit('typing', { toUserId, fromUserId, toGroupId })
       })
 
       socket.on('offTyping', () => {
          gIo.emit('offTyping')
       })
 
-      socket.on('login', (userId) => {
+      socket.on('login', userId => {
          socket.userId = userId
          gIo.emit('login', userId)
       })
 
-      socket.on('chat-add', (chat) => {
+      socket.on('chat-add', chat => {
          chatService.add(chat)
          gIo.emit('chat-add', chat)
       })
-
 
       // socket.on('chat-add', chat => {
       //    console.log('chat', chat)
