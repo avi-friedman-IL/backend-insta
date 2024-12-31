@@ -10,14 +10,13 @@ export function setupSocketAPI(http) {
          origin: '*',
       },
    })
-
    // Handling new socket connections
    gIo.on('connect', socket => {
       logger.info(`New connected socket [id: ${socket.id}]`)
 
-      // Handle socket disconnect
       socket.on('disconnect', () => {
-         // console.log(`Socket disconnected [id: ${socket.id}]`)
+         logger.info(`Socket [id: ${socket.id}] disconnected`)
+         delete socket.userId
       })
 
       socket.on('typing', ({ toUserId, fromUserId, toGroupId }) => {
@@ -31,11 +30,19 @@ export function setupSocketAPI(http) {
       socket.on('login', userId => {
          socket.userId = userId
          gIo.emit('login', userId)
+         logger.info(`Socket ${socket.id} logged in with userId: ${userId}`)
       })
 
-      socket.on('chat-add', chat => {
+      socket.on('chat-add', async chat => {
+         const toUserSocket = await _getUserSocket(chat.toUserId)
+         const fromUserSocket = await _getUserSocket(chat.fromUserId)
+         if (toUserSocket) {
+            toUserSocket.emit('chat-add', chat)
+         }
+         if (fromUserSocket) {
+            fromUserSocket.emit('chat-add', chat)
+         }
          chatService.add(chat)
-         gIo.emit('chat-add', chat)
       })
 
       // socket.on('chat-add', chat => {
@@ -175,7 +182,16 @@ async function broadcast({ type, data, room = null, userId }) {
 // Get the socket of a specific user
 async function _getUserSocket(userId) {
    const sockets = await _getAllSockets()
-   return sockets.find(s => s.userId === userId)
+   console.log(
+      'All sockets:',
+      sockets.map(s => ({ id: s.id, userId: s.userId }))
+   )
+
+   const socket = sockets.find(s => s.userId === userId)
+   socket
+      ? _printSocket(socket)
+      : console.log(`No socket found for userId: ${userId}`)
+   return socket
 }
 
 // Get all active sockets

@@ -41,12 +41,6 @@ async function add(chat) {
    try {
       const collection = await dbService.getCollection('chat')
       await collection.insertOne(chat)
-      // socketService.broadcast({
-      //    type: 'chat-add',
-      //    data: chat,
-      //    userId: chat.fromUserId,
-      // })
-
       return chat
    } catch (err) {
       logger.error('cannot insert chat', err)
@@ -77,7 +71,6 @@ async function update(chat) {
       socketService.broadcast({
          type: 'chat-update',
          data: chat,
-         userId: chat.fromUserId,
       })
       return chat
    } catch (err) {
