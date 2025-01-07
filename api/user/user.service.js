@@ -78,6 +78,7 @@ async function update(user) {
          isGoogleLogin: user.isGoogleLogin,
          contacts: user.contacts,
          groups: user.groups, 
+         newMsgs: user.newMsgs,
       }
       const collection = await dbService.getCollection('user')
       await collection.updateOne({ _id: userToSave._id }, { $set: userToSave })
