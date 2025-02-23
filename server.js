@@ -51,6 +51,7 @@ import { userRoutes } from './api/user/user.routes.js'
 import { scriptRoutes } from './api/script/script.routes.js'
 import { objectionRoutes } from './api/objection/objection.routes.js'
 import { chatRoutes } from './api/chat/chat.routes.js'
+import { msgRoutes } from './api/msg/msg.routes.js'
 
 // routes
 app.use('/api/auth', authRoutes)
@@ -58,6 +59,7 @@ app.use('/api/user', userRoutes)
 app.use('/api/script', scriptRoutes)
 app.use('/api/objection', objectionRoutes)
 app.use('/api/chat', chatRoutes)
+app.use('/api/msg', msgRoutes)
 
 
 app.get('/**', (req, res) => {

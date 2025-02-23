@@ -1,4 +1,6 @@
 import { chatService } from '../api/chat/chat.service.js'
+import { msgService } from '../api/msg/msg.service.js'
+import { userService } from '../api/user/user.service.js'
 import { logger } from './logger.service.js'
 import { Server } from 'socket.io'
 
@@ -29,6 +31,12 @@ export function setupSocketAPI(http) {
 
       socket.on('updateLoggedUser', user => {
          gIo.emit('updateLoggedUser', user)
+         logger.info(`User ${user._id} updated`)
+      })
+
+      socket.on('user-update', user => {
+         gIo.emit('user-update', user)
+         userService.update(user)
          logger.info(`User ${user._id} updated`)
       })
 
@@ -68,6 +76,18 @@ export function setupSocketAPI(http) {
             }
          }
          chatService.add(chat)
+      })
+
+      socket.on('msg-add', async msg => {
+         gIo.emit('msg-add', msg)
+         msgService.add(msg)
+         logger.info(`Emitting msg to all users`)
+      })
+
+      socket.on('msg-update', async msg => {
+         gIo.emit('msg-update', msg)
+         msgService.update(msg)
+         logger.info(`Emitting msg-update to all users`)
       })
    })
 }
