@@ -89,6 +89,11 @@ export function setupSocketAPI(http) {
          msgService.update(msg)
          logger.info(`Emitting msg-update to all users`)
       })
+
+      socket.on('on-respected-msg', async ({userName,amount}) => {
+         gIo.emit('on-respected-msg', {userName,amount})
+         logger.info(`Emitting on-respected-msg to all users`)
+      })
    })
 }
 
