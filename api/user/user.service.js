@@ -7,6 +7,7 @@ export const userService = {
    query,
    getById,
    getByEmail,
+   getByUsername,
    remove,
    update,
    add,
@@ -57,6 +58,20 @@ async function getByEmail(email) {
    }
 }
 
+async function getByUsername(username) {
+   try {
+      const collection = await dbService.getCollection('user')
+      const user = await collection.findOne({
+         username,
+      })
+      return user
+   }
+   catch (err) {
+      logger.error(`while finding user ${username}`, err)
+      throw err
+   }
+}
+
 async function remove(userId) {
    try {
       const collection = await dbService.getCollection('user')
@@ -93,7 +108,9 @@ async function update(user) {
 async function add(user) {
    try {
       // Validate that there are no such user:
-      const existUser = await getByEmail(user.email)
+      // const existUser = await getByEmail(user.email) 
+      // const existUser = await getById(user._id)
+      const existUser = await getByUsername(user.username)
       if (existUser) throw new Error('Username taken')
 
       // peek only updatable fields!
@@ -101,6 +118,7 @@ async function add(user) {
          email: user.email,
          password: user.password,
          fullname: user.fullname,
+         username: user.username,
          imgUrl: user.imgUrl,
          isGoogleLogin: user.isGoogleLogin || false,
       }

@@ -7,9 +7,8 @@ import { OAuth2Client } from 'google-auth-library'
 import { userService } from '../user/user.service.js'
 import { logger } from '../../services/logger.service.js'
 
-
 if (!process.env.GOOGLE_CLIENT_ID || !process.env.SECRET_KEY) {
-   throw new Error('Cryptr: secret must be a non-0-length string');
+   throw new Error('Cryptr: secret must be a non-0-length string')
 }
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
@@ -23,14 +22,18 @@ export const authService = {
    validateToken,
 }
 
-async function login(email, password, isGoogleLogin) {
-   logger.debug(`auth.service - login with email: ${email}`)
+async function login(credentials, isGoogleLogin) {
+   logger.debug(`auth.service - login with username: ${credentials.username}`)
 
-   const user = await userService.getByEmail(email)
+   // const user = await userService.getByEmail(email)
+   const user = await userService.getByUsername(credentials.username)
+   const { password } = credentials
    if (!user) throw new Error('Invalid email or password')
 
-   const match = await bcrypt.compare(password, user.password)
+   const match = password === user.password
    if (!match && !isGoogleLogin) throw new Error('Invalid email or password')
+   // const match = await bcrypt.compare(password, user.password)
+   // if (!match && !isGoogleLogin) throw new Error('Invalid email or password')
 
    delete user.password
    return user
@@ -62,16 +65,17 @@ async function googleLogin(token) {
    return user
 }
 
-async function signup(email, password, fullname) {
+async function signup(credentials, isGoogleLogin) {
    const saltRounds = 10
 
    logger.debug(
-      `auth.service - signup with email: ${email}, fullname: ${fullname}`
+      `auth.service - signup with username: ${credentials.username}, fullname: ${credentials.fullname}`
    )
-   if (!email || !password || !fullname) throw new Error('Missing details')
+   if (!credentials.username || !credentials.password || !credentials.fullname)
+      throw new Error('Missing details')
 
-   const hash = await bcrypt.hash(password, saltRounds)
-   return userService.add({ email, password: hash, fullname })
+   // const hash = await bcrypt.hash(credentials.password, saltRounds)
+   return userService.add({ ...credentials, password: credentials.password })
 }
 
 function getLoginToken(user) {

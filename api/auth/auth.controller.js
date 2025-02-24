@@ -2,9 +2,9 @@ import { authService } from './auth.service.js'
 import { logger } from '../../services/logger.service.js'
 
 export async function login(req, res) {
-   const { email, password } = req.body
+   const credentials = req.body
    try {
-      const user = await authService.login(email, password, false)
+      const user = await authService.login(credentials, false)
       const loginToken = authService.getLoginToken(user)
 
       logger.info('User login: ', user)
@@ -39,13 +39,14 @@ export async function googleLogin(req, res) {
 
 export async function signup(req, res) {
    try {
-      const { email, password, fullname } = req.body
-      const account = await authService.signup(email, password, fullname)
+      // const { email, password, fullname } = req.body
+      const credentials = req.body
+      const account = await authService.signup(credentials, false)
       logger.debug(
          `auth.route - new account created: ` + JSON.stringify(account)
       )
 
-      const user = await authService.login(email, password, false)
+      const user = await authService.login(credentials, false)
       const loginToken = authService.getLoginToken(user)
 
       res.cookie('loginToken', loginToken)
