@@ -92,6 +92,12 @@ function _buildCriteria(filterBy) {
       criteria.subject = { $regex: filterBy.subject, $options: 'i' }
    }
 
+   if (filterBy.isDone === 'true') {
+      criteria.isDone = true
+   } else if (filterBy.isDone === 'false') {
+      criteria.isDone = false
+   }
+
    // criteria.sortBy = filterBy.sortBy || 'createdAt'
 
    console.log('criteria:', criteria)
