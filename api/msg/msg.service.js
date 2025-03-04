@@ -87,7 +87,7 @@ function _buildCriteria(filterBy) {
    if (filterBy.text) {
       const textPattern = filterBy.text.trim()
       criteria.$or = [
-         // { from: { $regex: textPattern, $options: 'i' } },
+         { fromName: { $regex: textPattern, $options: 'i' } },
          { subject: { $regex: textPattern, $options: 'i' } },
          { content: { $regex: textPattern, $options: 'i' } },
       ]
