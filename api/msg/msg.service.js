@@ -12,12 +12,12 @@ export const msgService = {
 }
 
 async function query(filterBy = {}) {
-   const criteria = _buildCriteria(filterBy)
+   const { criteria, sortOptions } = _buildCriteria(filterBy)
    try {
       const collection = await dbService.getCollection('msg')
       var msgs = await collection
          .find(criteria)
-         .sort({ createdAt: -1 })
+         .sort(sortOptions)
          .toArray()
       return msgs
    } catch (err) {
@@ -83,6 +83,7 @@ async function update(msg) {
 
 function _buildCriteria(filterBy) {
    const criteria = {}
+   let sortOptions = { createdAt: -1 } // default sort
 
    if (filterBy.text) {
       const textPattern = filterBy.text.trim()
@@ -103,8 +104,17 @@ function _buildCriteria(filterBy) {
       criteria.isDone = false
    }
 
-   // criteria.sortBy = filterBy.sortBy || 'createdAt'
+   if (filterBy.sortBy) {
+      if (filterBy.sortBy === 'date') {
+         sortOptions = { createdAt: -1 }
+      } else if (filterBy.sortBy === 'name') {
+         sortOptions = { fromName: 1 }
+      } else if (filterBy.sortBy === 'subject') {
+         sortOptions = { subject: 1 }
+      }
+   }
 
    console.log('criteria:', criteria)
-   return criteria
+   console.log('sortOptions:', sortOptions)
+   return { criteria, sortOptions }
 }
