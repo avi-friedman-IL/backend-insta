@@ -37,7 +37,8 @@ async function getById(scriptId) {
 async function remove(scriptId) {
    const collection = await dbService.getCollection('script')
    try {
-      await collection.deleteOne({ _id: ObjectId(scriptId) })
+      // await collection.deleteOne({ _id: ObjectId(scriptId) })'
+      await collection.deleteOne({ _id: ObjectId.createFromHexString(scriptId) })
    } catch (err) {
       console.log(`ERROR: cannot remove script ${scriptId}`)
       throw err
