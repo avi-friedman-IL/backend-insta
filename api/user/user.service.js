@@ -90,6 +90,7 @@ async function update(user) {
          fullname: user.fullname,
          email: user.email,
          imgUrl: user.imgUrl,
+         color: user.color,
          isGoogleLogin: user.isGoogleLogin,
          contacts: user.contacts,
          groups: user.groups,
@@ -120,6 +121,7 @@ async function add(user) {
          fullname: user.fullname,
          username: user.username,
          imgUrl: user.imgUrl,
+         color: user.color,
          isGoogleLogin: user.isGoogleLogin || false,
       }
       const collection = await dbService.getCollection('user')
