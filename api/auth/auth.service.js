@@ -26,7 +26,9 @@ async function login(credentials, isGoogleLogin) {
    logger.debug(`auth.service - login with username: ${credentials.username}`)
 
    // const user = await userService.getByEmail(email)
-   const user = await userService.getByUsername(credentials.username)
+   const user = isGoogleLogin
+      ? await userService.getByEmail(credentials.email)
+      : await userService.getByUsername(credentials.username)
    const { password } = credentials
    if (!user) throw new Error('Invalid email or password')
 

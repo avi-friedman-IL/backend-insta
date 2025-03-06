@@ -111,7 +111,9 @@ async function add(user) {
       // Validate that there are no such user:
       // const existUser = await getByEmail(user.email) 
       // const existUser = await getById(user._id)
-      const existUser = await getByUsername(user.username)
+      const existUser = user.isGoogleLogin
+         ? await getByEmail(user.email)
+         : await getByUsername(user.username)
       if (existUser) throw new Error('Username taken')
 
       // peek only updatable fields!

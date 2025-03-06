@@ -27,12 +27,12 @@ async function _connect() {
       const client = await MongoClient.connect(config.dbURL)
       const db = client.db(config.dbName)
       dbConn = db
-      const chatsCollection = db.collection('chat')
-      await chatsCollection.createIndex({ fromUserId: 1 })
-      await chatsCollection.createIndex({ toUserId: 1 })
-      await chatsCollection.createIndex({ toGroupId: 1 })
-      await chatsCollection.createIndex({ fromUserId: 1, toUserId: 1 })
-      console.log('Indexes created successfully for chats collection')
+      // const chatsCollection = db.collection('chat')
+      // await chatsCollection.createIndex({ fromUserId: 1 })
+      // await chatsCollection.createIndex({ toUserId: 1 })
+      // await chatsCollection.createIndex({ toGroupId: 1 })
+      // await chatsCollection.createIndex({ fromUserId: 1, toUserId: 1 })
+      // console.log('Indexes created successfully for chats collection')
       return db
    } catch (err) {
       logger.error('Cannot Connect to DB', err)
