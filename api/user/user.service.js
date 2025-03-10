@@ -22,8 +22,7 @@ async function query(filterBy = {}) {
          .sort({ nickname: -1 })
          .toArray()
       users = users.map(user => {
-         delete user.password
-         user.isHappy = true
+         // delete user.password
          user.createdAt = user._id.getTimestamp()
          return user
       })
@@ -40,7 +39,7 @@ async function getById(userId) {
       const user = await collection.findOne({
          _id: ObjectId.createFromHexString(userId),
       })
-      delete user.password
+      // delete user.password
       return user
    } catch (err) {
       logger.error(`while finding user ${userId}`, err)
@@ -84,10 +83,11 @@ async function remove(userId) {
 
 async function update(user) {
    try {
-      // peek only updatable fields!
       const userToSave = {
          _id: ObjectId.createFromHexString(user._id),
          fullname: user.fullname,
+         username: user.username,
+         password: user.password,
          email: user.email,
          imgUrl: user.imgUrl,
          color: user.color,
@@ -96,6 +96,8 @@ async function update(user) {
          groups: user.groups,
          newMsgs: user.newMsgs,
          notifications: user.notifications || [],
+         isAdmin: user.isAdmin || false,
+         isTeamManager: user.isTeamManager || false,
       }
       const collection = await dbService.getCollection('user')
       await collection.updateOne({ _id: userToSave._id }, { $set: userToSave })
@@ -108,7 +110,6 @@ async function update(user) {
 
 async function add(user) {
    try {
-      // Validate that there are no such user:
       // const existUser = await getByEmail(user.email) 
       // const existUser = await getById(user._id)
       const existUser = user.isGoogleLogin
@@ -116,7 +117,6 @@ async function add(user) {
          : await getByUsername(user.username)
       if (existUser) throw new Error('Username taken')
 
-      // peek only updatable fields!
       const userToAdd = {
          email: user.email,
          password: user.password,
@@ -125,6 +125,7 @@ async function add(user) {
          imgUrl: user.imgUrl,
          color: user.color,
          isGoogleLogin: user.isGoogleLogin || false,
+         isAdmin: user.isAdmin || false,
       }
       const collection = await dbService.getCollection('user')
       await collection.insertOne(userToAdd)
@@ -148,8 +149,6 @@ function _buildCriteria(filterBy) {
          },
       ]
    }
-   if (filterBy.minBalance) {
-      criteria.balance = { $gte: filterBy.minBalance }
-   }
+  
    return criteria
 }

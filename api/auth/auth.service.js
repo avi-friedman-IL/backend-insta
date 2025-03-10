@@ -37,7 +37,7 @@ async function login(credentials, isGoogleLogin) {
    // const match = await bcrypt.compare(password, user.password)
    // if (!match && !isGoogleLogin) throw new Error('Invalid email or password')
 
-   delete user.password
+   // delete user.password
    return user
 }
 
