@@ -30,7 +30,8 @@ const isLocalhost = Boolean(
       }
   
       window.addEventListener('load', () => {
-        const swUrl = '/service-worker.js';
+        // Use the current origin for the service worker URL
+        const swUrl = `${window.location.origin}/service-worker.js`;
   
         if (isLocalhost) {
           // This is running on localhost. Let's check if a service worker still exists or not.
