@@ -64,8 +64,7 @@ async function getByUsername(username) {
          username,
       })
       return user
-   }
-   catch (err) {
+   } catch (err) {
       logger.error(`while finding user ${username}`, err)
       throw err
    }
@@ -110,7 +109,7 @@ async function update(user) {
 
 async function add(user) {
    try {
-      // const existUser = await getByEmail(user.email) 
+      // const existUser = await getByEmail(user.email)
       // const existUser = await getById(user._id)
       const existUser = user.isGoogleLogin
          ? await getByEmail(user.email)
@@ -138,17 +137,9 @@ async function add(user) {
 
 function _buildCriteria(filterBy) {
    const criteria = {}
-   if (filterBy.txt) {
-      const txtCriteria = { $regex: filterBy.txt, $options: 'i' }
-      criteria.$or = [
-         {
-            username: txtCriteria,
-         },
-         {
-            fullname: txtCriteria,
-         },
-      ]
+   if (filterBy.text) {
+      const txtCriteria = { $regex: filterBy.text, $options: 'i' }
+      criteria.fullname = txtCriteria
    }
-  
    return criteria
 }
