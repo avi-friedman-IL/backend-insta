@@ -57,7 +57,7 @@ async function googleLogin(token) {
          password: sub,
          fullname: name,
          imgUrl: picture,
-         isAdmin: true,
+         isAdmin: false,
          email: email,
          isGoogleLogin: true,
       }

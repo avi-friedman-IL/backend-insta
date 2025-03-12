@@ -14,7 +14,7 @@ export const userRoutes = express.Router()
 
 userRoutes.get('/', getUsers)
 userRoutes.get('/:id', getUser)
-userRoutes.put('/:id', requireAdmin, updateUser)
+userRoutes.put('/:id', updateUser)
 userRoutes.post('/', requireAdmin, addUser)
 
 // userRoutes.put('/:id',  requireAuth, updateUser)
