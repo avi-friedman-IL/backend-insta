@@ -84,7 +84,11 @@ async function update(msg) {
 function _buildCriteria(filterBy) {
    const criteria = {}
    let sortOptions = { createdAt: -1 } // default sort
-
+   if (filterBy.loggedinUserId) {
+      if (!filterBy.isAdmin || filterBy.isAdmin === 'false' && !filterBy.isTeamManager || filterBy.isTeamManager === 'false') {
+         criteria.from = filterBy.loggedinUserId
+      }
+   }
    if (filterBy.text) {
       const textPattern = filterBy.text.trim()
       criteria.$or = [
