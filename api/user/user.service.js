@@ -97,6 +97,7 @@ async function update(user) {
          notifications: user.notifications || [],
          isAdmin: user.isAdmin || false,
          isTeamManager: user.isTeamManager || false,
+         contacts: user.contacts || [],
       }
       const collection = await dbService.getCollection('user')
       await collection.updateOne({ _id: userToSave._id }, { $set: userToSave })
@@ -125,6 +126,7 @@ async function add(user) {
          color: user.color,
          isGoogleLogin: user.isGoogleLogin || false,
          isAdmin: user.isAdmin || false,
+         contacts: user.contacts || [],
       }
       const collection = await dbService.getCollection('user')
       await collection.insertOne(userToAdd)
