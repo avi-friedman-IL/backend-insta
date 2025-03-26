@@ -110,8 +110,6 @@ async function update(user) {
 
 async function add(user) {
    try {
-      // const existUser = await getByEmail(user.email)
-      // const existUser = await getById(user._id)
       const existUser = user.isGoogleLogin
          ? await getByEmail(user.email)
          : await getByUsername(user.username)
