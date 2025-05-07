@@ -124,7 +124,7 @@ async function add(user) {
          color: user.color,
          isGoogleLogin: user.isGoogleLogin || false,
          // isAdmin: user.isAdmin || false,
-         isAdmin: true,
+         isAdmin: false,
          contacts: user.contacts || [],
       }
       const collection = await dbService.getCollection('user')
