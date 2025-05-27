@@ -19,10 +19,9 @@ async function query(filterBy = {}) {
       const collection = await dbService.getCollection('user')
       var users = await collection
          .find(criteria)
-         .sort({ nickname: -1 })
+         .sort({ username: 1 })
          .toArray()
       users = users.map(user => {
-         // delete user.password
          user.createdAt = user._id.getTimestamp()
          return user
       })
@@ -123,7 +122,6 @@ async function add(user) {
          imgUrl: user.imgUrl,
          color: user.color,
          isGoogleLogin: user.isGoogleLogin || false,
-         // isAdmin: user.isAdmin || false,
          isAdmin: false,
          contacts: user.contacts || [],
       }
@@ -142,5 +140,6 @@ function _buildCriteria(filterBy) {
       const txtCriteria = { $regex: filterBy.text, $options: 'i' }
       criteria.fullname = txtCriteria
    }
+   
    return criteria
 }
