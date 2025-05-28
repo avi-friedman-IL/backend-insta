@@ -21,6 +21,7 @@ async function query(filterBy = {}) {
          .find(criteria)
          .sort({ username: 1 })
          .toArray()
+
       users = users.map(user => {
          user.createdAt = user._id.getTimestamp()
          return user
@@ -140,6 +141,12 @@ function _buildCriteria(filterBy) {
       const txtCriteria = { $regex: filterBy.text, $options: 'i' }
       criteria.fullname = txtCriteria
    }
-   
+
+   if (filterBy.isAdmin === 'false') {
+      criteria.$or = [
+         { isAdmin: true },
+         { isTeamManager: true },
+      ]
+   }
    return criteria
 }
