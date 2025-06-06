@@ -19,72 +19,101 @@ cloudinary.v2.config({
 // פונקציה להעלאת קובץ לענן
 async function uploadFileToCloudinary(file) {
    try {
-      if (!file || !file.data) return null;
-      
+      if (!file || !file.data) return null
+
       const base64Data = file.data.split(',')[1]
       const buffer = Buffer.from(base64Data, 'base64')
-      const fileName = `${Date.now()}-${file.name.replace(/[^A-Za-z0-9.]/g, '_')}`
-      
+      const fileName = `${Date.now()}-${file.name.replace(
+         /[^A-Za-z0-9.]/g,
+         '_'
+      )}`
+
       // בדיקה אם זה קובץ PDF ושינוי הפרמטרים בהתאם
-      const isPDF = file.name.toLowerCase().endsWith('.pdf');
-      
+      const isExcel = /\.(xlsx|xls|csv)$/i.test(file.name)
+      const isPDF = file.name.toLowerCase().endsWith('.pdf')
+
       const uploadResult = await new Promise((resolve, reject) => {
          cloudinary.v2.uploader
             .upload_stream(
-               { 
-                  public_id: fileName, 
-                  resource_type: 'auto',
-                  // אם זה PDF, אנחנו רוצים שהוא יהיה נגיש לצפייה ושיוכלו להוריד אותו
-                  ...(isPDF ? {
-                     format: 'pdf',
-                     pages: true
-                  } : {})
+               {
+                  public_id: fileName,
+                  resource_type: isExcel ? 'raw' : 'auto',
+                  ...(isPDF ? { format: 'pdf', pages: true } : {}),
                },
                (error, result) => {
-                  if (error) {
-                     logger.error('Cloudinary upload error:', error)
-                     reject(error)
-                  } else {
-                     resolve(result)
-                  }
+                  if (error) reject(error)
+                  else resolve(result)
                }
             )
             .end(buffer)
       })
-      
+
+      // const isPDF = file.name.toLowerCase().endsWith('.pdf');
+
+      // const uploadResult = await new Promise((resolve, reject) => {
+      //    cloudinary.v2.uploader
+      //       .upload_stream(
+      //          {
+      //             public_id: fileName,
+      //             resource_type: 'auto',
+      //             // אם זה PDF, אנחנו רוצים שהוא יהיה נגיש לצפייה ושיוכלו להוריד אותו
+      //             ...(isPDF ? {
+      //                format: 'pdf',
+      //                pages: true
+      //             } : {})
+      //          },
+      //          (error, result) => {
+      //             if (error) {
+      //                logger.error('Cloudinary upload error:', error)
+      //                reject(error)
+      //             } else {
+      //                resolve(result)
+      //             }
+      //          }
+      //       )
+      //       .end(buffer)
+      // })
+
       if (!uploadResult || !uploadResult.secure_url) {
          logger.error('Uploaded file URL is not valid')
          return null
       }
-      
+
       const fileInfo = {
          url: uploadResult.secure_url,
          originalName: file.name,
          // Update to properly handle image mime types
-         type: uploadResult.resource_type === 'image' 
-            ? `image/${uploadResult.format}` 
-            : file.type || 'application/octet-stream',
+         type:
+            uploadResult.resource_type === 'image'
+               ? `image/${uploadResult.format}`
+               : file.type || 'application/octet-stream',
          format: uploadResult.format || '',
-         size: file.size || 0
+         size: file.size || 0,
       }
-      
+
       // יצירת URL להורדה וצפייה
       if (isPDF) {
          // לקבצי PDF, משתמשים ב-URL שונים להצגה והורדה
-         fileInfo.viewUrl = fileInfo.url;
-         fileInfo.downloadUrl = `${fileInfo.url.replace('/upload/', '/upload/fl_attachment/')}`; 
+         fileInfo.viewUrl = fileInfo.url
+         fileInfo.downloadUrl = `${fileInfo.url.replace(
+            '/upload/',
+            '/upload/fl_attachment/'
+         )}`
       } else {
          // לשאר הקבצים
-         fileInfo.viewUrl = fileInfo.url;
-         fileInfo.downloadUrl = `${fileInfo.url.replace('/upload/', '/upload/fl_attachment/')}`;
+         fileInfo.viewUrl = fileInfo.url
+         fileInfo.downloadUrl = `${fileInfo.url.replace(
+            '/upload/',
+            '/upload/fl_attachment/'
+         )}`
       }
-      
+
       logger.info(`File uploaded successfully: ${fileInfo.url}`)
       logger.info(`File type: ${fileInfo.type}, format: ${fileInfo.format}`)
       logger.info(`View URL: ${fileInfo.viewUrl}`)
       logger.info(`Download URL: ${fileInfo.downloadUrl}`)
-      
-      return fileInfo;
+
+      return fileInfo
    } catch (error) {
       logger.error('Error uploading file to Cloudinary:', error)
       return null
@@ -148,7 +177,7 @@ export function setupSocketAPI(http) {
                   chat.file = { ...chat.file, ...fileInfo }
                }
             }
-            
+
             const toUserSocket = await _getUserSocket(chat.toUserId)
             const fromUserSocket = await _getUserSocket(chat.fromUserId)
 
