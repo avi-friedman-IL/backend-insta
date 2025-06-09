@@ -48,32 +48,6 @@ async function uploadFileToCloudinary(file) {
             .end(buffer)
       })
 
-      // const isPDF = file.name.toLowerCase().endsWith('.pdf');
-
-      // const uploadResult = await new Promise((resolve, reject) => {
-      //    cloudinary.v2.uploader
-      //       .upload_stream(
-      //          {
-      //             public_id: fileName,
-      //             resource_type: 'auto',
-      //             // אם זה PDF, אנחנו רוצים שהוא יהיה נגיש לצפייה ושיוכלו להוריד אותו
-      //             ...(isPDF ? {
-      //                format: 'pdf',
-      //                pages: true
-      //             } : {})
-      //          },
-      //          (error, result) => {
-      //             if (error) {
-      //                logger.error('Cloudinary upload error:', error)
-      //                reject(error)
-      //             } else {
-      //                resolve(result)
-      //             }
-      //          }
-      //       )
-      //       .end(buffer)
-      // })
-
       if (!uploadResult || !uploadResult.secure_url) {
          logger.error('Uploaded file URL is not valid')
          return null
