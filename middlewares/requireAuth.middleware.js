@@ -27,6 +27,20 @@ export async function requireAdmin(req, res, next) {
     next()
 }
 
+export async function requireTeamManager(req, res, next) {
+    if (!req?.cookies?.loginToken) {
+        return res.status(401).send('Not Authenticated')
+    }
+    
+    const loggedinUser = authService.validateToken(req.cookies.loginToken)
+    if (!loggedinUser.isTeamManager && !loggedinUser.isAdmin) {
+        logger.warn(loggedinUser.fullname + 'attempted to perform team manager action')
+        res.status(403).end('Not Authorized')
+        return
+    }
+    next()
+}
+
 export async function requireOwner(req, res, next) {
     if (!req?.cookies?.loginToken) {
         return res.status(401).send('Not Authenticated')

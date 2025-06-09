@@ -52,6 +52,7 @@ import { objectionRoutes } from './api/objection/objection.routes.js'
 import { chatRoutes } from './api/chat/chat.routes.js'
 import { msgRoutes } from './api/msg/msg.routes.js'
 import { templateRoutes } from './api/template/template.routes.js'
+import { trainingRoutes } from './api/training/training.routes.js'
 // routes
 app.use('/api/auth', authRoutes)
 app.use('/api/user', userRoutes)
@@ -60,7 +61,7 @@ app.use('/api/objection', objectionRoutes)
 app.use('/api/chat', chatRoutes)
 app.use('/api/msg', msgRoutes)
 app.use('/api/template', templateRoutes)
-
+app.use('/api/training', trainingRoutes)
 
 app.get('/**', (req, res) => {
     res.sendFile(path.resolve('public/index.html'))
