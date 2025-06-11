@@ -39,6 +39,15 @@ async function uploadFileToCloudinary(file) {
                   public_id: fileName,
                   resource_type: isExcel ? 'raw' : 'auto',
                   ...(isPDF ? { format: 'pdf', pages: true } : {}),
+                  // Add production-specific settings
+                  quality: 'auto',
+                  fetch_format: 'auto',
+                  flags: 'attachment',
+                  transformation: [
+                     { fetch_format: 'auto' },
+                     { quality: 'auto' },
+                     { flags: 'attachment' }
+                  ]
                },
                (error, result) => {
                   if (error) reject(error)
@@ -56,7 +65,6 @@ async function uploadFileToCloudinary(file) {
       const fileInfo = {
          url: uploadResult.secure_url,
          originalName: file.name,
-         // Update to properly handle image mime types
          type:
             uploadResult.resource_type === 'image'
                ? `image/${uploadResult.format}`
@@ -67,18 +75,16 @@ async function uploadFileToCloudinary(file) {
 
       // יצירת URL להורדה וצפייה
       if (isPDF) {
-         // לקבצי PDF, משתמשים ב-URL שונים להצגה והורדה
          fileInfo.viewUrl = fileInfo.url
          fileInfo.downloadUrl = `${fileInfo.url.replace(
             '/upload/',
-            '/upload/fl_attachment/'
+            '/upload/fl_attachment,fl_force_download/'
          )}`
       } else {
-         // לשאר הקבצים
          fileInfo.viewUrl = fileInfo.url
          fileInfo.downloadUrl = `${fileInfo.url.replace(
             '/upload/',
-            '/upload/fl_attachment/'
+            '/upload/fl_attachment,fl_force_download/'
          )}`
       }
 
