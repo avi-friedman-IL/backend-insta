@@ -4,6 +4,9 @@ import { getMsg, getMsgs, addMsg, deleteMsg, updateMsg } from './msg.controller.
 
 export const msgRoutes = express.Router();
 
+// middleware that is specific to this router
+msgRoutes.use(requireAuth);
+
 msgRoutes.get('/', getMsgs);
 msgRoutes.get('/:id', getMsg);
 msgRoutes.post('/', addMsg);

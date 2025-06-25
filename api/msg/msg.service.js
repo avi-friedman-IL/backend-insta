@@ -11,10 +11,10 @@ export const msgService = {
    update,
 }
 
-async function query(filterBy = {}) {
+async function query(filterBy = {}, gender = 'male') {
    const { criteria, sortOptions } = _buildCriteria(filterBy)
    try {
-      const collection = await dbService.getCollection('msg')
+      const collection = await dbService.getGenderCollection('msg', gender)
       var msgs = await collection
          .find(criteria)
          .sort(sortOptions)
@@ -26,9 +26,9 @@ async function query(filterBy = {}) {
    }
 }
 
-async function getById(msgId) {
+async function getById(msgId, gender = 'male') {
    try {
-      const collection = await dbService.getCollection('msg')
+      const collection = await dbService.getGenderCollection('msg', gender)
       const msg = await collection.findOne({
          _id: ObjectId.createFromHexString(msgId),
       })
@@ -39,9 +39,9 @@ async function getById(msgId) {
    }
 }
 
-async function add(msg) {
+async function add(msg, gender = 'male') {
    try {
-      const collection = await dbService.getCollection('msg')
+      const collection = await dbService.getGenderCollection('msg', gender)
       await collection.insertOne(msg)
       return msg
    } catch (err) {
@@ -50,9 +50,9 @@ async function add(msg) {
    }
 }
 
-async function remove(msgId) {
+async function remove(msgId, gender = 'male') {
    try {
-      const collection = await dbService.getCollection('msg')
+      const collection = await dbService.getGenderCollection('msg', gender)
       await collection.deleteOne({ _id: ObjectId.createFromHexString(msgId) })
       socketService.broadcast({ type: 'msg-remove', data: msgId })
    } catch (err) {
@@ -61,11 +61,11 @@ async function remove(msgId) {
    }
 }
 
-async function update(msg) {
+async function update(msg, gender = 'male') {
    try {
       const msgToSave = { ...msg }
       delete msgToSave._id
-      const collection = await dbService.getCollection('msg')
+      const collection = await dbService.getGenderCollection('msg', gender)
       await collection.updateOne(
          { _id: ObjectId.createFromHexString(msg._id) },
          { $set: msgToSave }

@@ -9,9 +9,9 @@ export const scriptService = {
 import { dbService } from '../../services/db.service.js'
 import { ObjectId } from 'mongodb'
 
-async function query(filterBy = {}) {
+async function query(filterBy = {}, gender = 'male') {
    const criteria = _buildCriteria(filterBy)
-   const collection = await dbService.getCollection('script')
+   const collection = await dbService.getGenderCollection('script', gender)
    try {
       const scripts = await collection.find(criteria).toArray()
       return scripts
@@ -21,8 +21,8 @@ async function query(filterBy = {}) {
    }
 }
 
-async function getById(scriptId) {
-   const collection = await dbService.getCollection('script')
+async function getById(scriptId, gender = 'male') {
+   const collection = await dbService.getGenderCollection('script', gender)
    try {
       const script = await collection.findOne({
          _id: ObjectId.createFromHexString(scriptId),
@@ -34,8 +34,8 @@ async function getById(scriptId) {
    }
 }
 
-async function remove(scriptId) {
-   const collection = await dbService.getCollection('script')
+async function remove(scriptId, gender = 'male') {
+   const collection = await dbService.getGenderCollection('script', gender)
    try {
       // await collection.deleteOne({ _id: ObjectId(scriptId) })'
       await collection.deleteOne({ _id: ObjectId.createFromHexString(scriptId) })
@@ -45,10 +45,10 @@ async function remove(scriptId) {
    }
 }
 
-async function update(script) {
+async function update(script, gender = 'male') {
    try {
         const scriptToSave = {...script, _id: ObjectId.createFromHexString(script._id)}
-        const collection = await dbService.getCollection('script')
+        const collection = await dbService.getGenderCollection('script', gender)
         // script._id = ObjectId.createFromHexString(script._id)
         await collection.updateOne({ _id: scriptToSave._id }, { $set: scriptToSave })
         return scriptToSave
@@ -58,8 +58,8 @@ async function update(script) {
    }
 }
 
-async function add(script) {
-   const collection = await dbService.getCollection('script')
+async function add(script, gender = 'male') {
+   const collection = await dbService.getGenderCollection('script', gender)
    try {
       await collection.insertOne(script)
       return script

@@ -85,6 +85,7 @@ function getLoginToken(user) {
       _id: user._id,
       fullname: user.fullname,
       isAdmin: user.isAdmin,
+      gender: user.gender || 'male'
    }
    return cryptr.encrypt(JSON.stringify(userInfo))
 }

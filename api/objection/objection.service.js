@@ -9,9 +9,9 @@ export const objectionService = {
 import { dbService } from '../../services/db.service.js'
 import { ObjectId } from 'mongodb'
 
-async function query(filterBy = {}) {
+async function query(filterBy = {}, gender = 'male') {
    const criteria = _buildCriteria(filterBy)
-   const collection = await dbService.getCollection('objection')
+   const collection = await dbService.getGenderCollection('objection', gender)
    try {
       const objections = await collection.find(criteria).toArray()
       return objections
@@ -21,8 +21,8 @@ async function query(filterBy = {}) {
    }
 }
 
-async function getById(objectionId) {
-   const collection = await dbService.getCollection('objection')
+async function getById(objectionId, gender = 'male') {
+   const collection = await dbService.getGenderCollection('objection', gender)
    try {
       const objection = await collection.findOne({
          _id: ObjectId.createFromHexString(objectionId),
@@ -34,8 +34,8 @@ async function getById(objectionId) {
    }
 }
 
-async function remove(objectionId) {
-   const collection = await dbService.getCollection('objection')
+async function remove(objectionId, gender = 'male') {
+   const collection = await dbService.getGenderCollection('objection', gender)
    try {
       await collection.deleteOne({ _id: ObjectId(objectionId) })
    } catch (err) {
@@ -44,10 +44,10 @@ async function remove(objectionId) {
    }
 }
 
-async function update(objection) {
+async function update(objection, gender = 'male') {
    try {
         const objectionToSave = {...objection, _id: ObjectId.createFromHexString(objection._id)}
-        const collection = await dbService.getCollection('objection')
+        const collection = await dbService.getGenderCollection('objection', gender)
         // objection._id = ObjectId.createFromHexString(objection._id)
         await collection.updateOne({ _id: objectionToSave._id }, { $set: objectionToSave })
         return objectionToSave
@@ -57,8 +57,8 @@ async function update(objection) {
    }
 }
 
-async function add(objection) {
-   const collection = await dbService.getCollection('objection')
+async function add(objection, gender = 'male') {
+   const collection = await dbService.getGenderCollection('objection', gender)
    try {
       await collection.insertOne(objection)
       return objection

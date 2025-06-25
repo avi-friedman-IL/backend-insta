@@ -82,6 +82,11 @@ async function remove(userId) {
 
 async function update(user) {
    try {
+      // בדיקה אם המשתמש קיים ומה המגדר הנוכחי שלו
+      const existingUser = await getById(user._id)
+      const oldGender = existingUser?.gender || 'male'
+      const newGender = user.gender || 'male'
+      
       const userToSave = {
          _id: ObjectId.createFromHexString(user._id),
          fullname: user.fullname,
@@ -90,6 +95,7 @@ async function update(user) {
          email: user.email,
          imgUrl: user.imgUrl,
          color: user.color,
+         gender: newGender,
          isGoogleLogin: user.isGoogleLogin,
          contacts: user.contacts,
          groups: user.groups,
@@ -101,6 +107,17 @@ async function update(user) {
       }
       const collection = await dbService.getCollection('user')
       await collection.updateOne({ _id: userToSave._id }, { $set: userToSave })
+      
+      // יצירת קולקציות אוטומטית אם המגדר השתנה
+      if (oldGender !== newGender) {
+         try {
+            await dbService.createGenderCollectionsIfNotExist(newGender)
+         } catch (genderErr) {
+            logger.warn(`Failed to create gender collections for ${newGender}:`, genderErr)
+            // לא זורקים שגיאה כדי לא לחסום את עדכון המשתמש
+         }
+      }
+      
       return userToSave
    } catch (err) {
       logger.error(`cannot update user ${user._id}`, err)
@@ -122,12 +139,22 @@ async function add(user) {
          username: user.username,
          imgUrl: user.imgUrl,
          color: user.color,
+         gender: user.gender || 'male',
          isGoogleLogin: user.isGoogleLogin || false,
          isAdmin: false,
          contacts: user.contacts || [],
       }
       const collection = await dbService.getCollection('user')
       await collection.insertOne(userToAdd)
+      
+      // יצירת קולקציות אוטומטית עבור המגדר של המשתמש החדש
+      try {
+         await dbService.createGenderCollectionsIfNotExist(userToAdd.gender)
+      } catch (genderErr) {
+         logger.warn(`Failed to create gender collections for ${userToAdd.gender}:`, genderErr)
+         // לא זורקים שגיאה כדי לא לחסום את יצירת המשתמש
+      }
+      
       return userToAdd
    } catch (err) {
       logger.error('cannot insert user', err)
@@ -140,6 +167,10 @@ function _buildCriteria(filterBy) {
    if (filterBy.text) {
       const txtCriteria = { $regex: filterBy.text, $options: 'i' }
       criteria.fullname = txtCriteria
+   }
+
+   if (filterBy.gender) {
+      criteria.gender = filterBy.gender
    }
 
    if (filterBy.isAdmin === 'false') {

@@ -11,10 +11,10 @@ export const trainingService = {
    update,
 }
 
-async function query(filterBy = {}) {
+async function query(filterBy = {}, gender = 'male') {
    const { criteria, sortOptions } = _buildCriteria(filterBy)
    try {
-      const collection = await dbService.getCollection('training')
+      const collection = await dbService.getGenderCollection('training', gender)
       var trainings = await collection
          .find(criteria)
          .sort(sortOptions)
@@ -26,9 +26,9 @@ async function query(filterBy = {}) {
    }
 }
 
-async function getById(trainingId) {
+async function getById(trainingId, gender = 'male') {
    try {
-      const collection = await dbService.getCollection('training')
+      const collection = await dbService.getGenderCollection('training', gender)
       const training = await collection.findOne({
          _id: ObjectId.createFromHexString(trainingId),
       })
@@ -39,9 +39,9 @@ async function getById(trainingId) {
    }
 }
 
-async function add(training) {
+async function add(training, gender = 'male') {
    try {
-      const collection = await dbService.getCollection('training')
+      const collection = await dbService.getGenderCollection('training', gender)
       await collection.insertOne(training)
       return training
    } catch (err) {
@@ -50,9 +50,9 @@ async function add(training) {
    }
 }
 
-async function remove(trainingId) {
+async function remove(trainingId, gender = 'male') {
    try {
-      const collection = await dbService.getCollection('training')
+      const collection = await dbService.getGenderCollection('training', gender)
       await collection.deleteOne({ _id: ObjectId.createFromHexString(trainingId) })
       socketService.broadcast({ type: 'training-remove', data: trainingId })
    } catch (err) {
@@ -61,11 +61,11 @@ async function remove(trainingId) {
    }
 }
 
-async function update(training) {
+async function update(training, gender = 'male') {
    try {
       const trainingToSave = { ...training }
       delete trainingToSave._id
-      const collection = await dbService.getCollection('training')
+      const collection = await dbService.getGenderCollection('training', gender)
       await collection.updateOne(
          { _id: ObjectId.createFromHexString(training._id) },
          { $set: trainingToSave }

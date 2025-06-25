@@ -11,10 +11,10 @@ export const templateService = {
    update,
 }
 
-async function query(filterBy = {}) {
+async function query(filterBy = {}, gender = 'male') {
    const { criteria, sortOptions } = _buildCriteria(filterBy)
    try {
-      const collection = await dbService.getCollection('template')
+      const collection = await dbService.getGenderCollection('template', gender)
       var templates = await collection
          .find(criteria)
          .sort(sortOptions)
@@ -26,9 +26,9 @@ async function query(filterBy = {}) {
    }
 }
 
-async function getById(templateId) {
+async function getById(templateId, gender = 'male') {
    try {
-      const collection = await dbService.getCollection('template')
+      const collection = await dbService.getGenderCollection('template', gender)
       const template = await collection.findOne({
          _id: ObjectId.createFromHexString(templateId),
       })
@@ -39,9 +39,9 @@ async function getById(templateId) {
    }
 }
 
-async function add(template) {
+async function add(template, gender = 'male') {
    try {
-      const collection = await dbService.getCollection('template')
+      const collection = await dbService.getGenderCollection('template', gender)
       await collection.insertOne(template)
       return template
    } catch (err) {
@@ -50,9 +50,9 @@ async function add(template) {
    }
 }
 
-async function remove(templateId) {
+async function remove(templateId, gender = 'male') {
    try {
-      const collection = await dbService.getCollection('template')
+      const collection = await dbService.getGenderCollection('template', gender)
       await collection.deleteOne({ _id: ObjectId.createFromHexString(templateId) })
       socketService.broadcast({ type: 'template-remove', data: templateId })
    } catch (err) {
@@ -61,11 +61,11 @@ async function remove(templateId) {
    }
 }
 
-async function update(template) {
+async function update(template, gender = 'male') {
    try {
       const templateToSave = { ...template }
       delete templateToSave._id
-      const collection = await dbService.getCollection('template')
+      const collection = await dbService.getGenderCollection('template', gender)
       await collection.updateOne(
          { _id: ObjectId.createFromHexString(template._id) },
          { $set: templateToSave }
