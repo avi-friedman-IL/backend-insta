@@ -17,57 +17,27 @@ const cryptr = new Cryptr(process.env.SECRET_KEY)
 export const authService = {
    signup,
    login,
-   googleLogin,
    getLoginToken,
    validateToken,
 }
 
-async function login(credentials, isGoogleLogin) {
+async function login(credentials) {
    logger.debug(`auth.service - login with username: ${credentials.username}`)
 
-   // const user = await userService.getByEmail(email)
-   const user = isGoogleLogin
-      ? await userService.getByEmail(credentials.email)
-      : await userService.getByUsername(credentials.username)
+   const user = await userService.getByUsername(credentials.username)
    const { password } = credentials
    if (!user) throw new Error('Invalid email or password')
 
    const match = password === user.password
-   if (!match && !isGoogleLogin) throw new Error('Invalid email or password')
+   if (!match) throw new Error('Invalid email or password')
    // const match = await bcrypt.compare(password, user.password)
-   // if (!match && !isGoogleLogin) throw new Error('Invalid email or password')
+   // if (!match) throw new Error('Invalid email or password')
 
    // delete user.password
    return user
 }
 
-async function googleLogin(token) {
-   const ticket = await client.verifyIdToken({
-      idToken: token,
-      audience: process.env.GOOGLE_CLIENT_ID, // Specify the CLIENT_ID of the app that accesses the backend
-   })
-   const payload = ticket.getPayload()
-
-   let user = await userService.getByEmail(payload.email)
-   if (user) user._id = user._id.toString()
-
-   const { sub, email, name, picture, hashing } = payload
-   if (!user) {
-      const newUser = {
-         password: sub,
-         fullname: name,
-         imgUrl: picture,
-         isAdmin: false,
-         email: email,
-         isGoogleLogin: true,
-      }
-      await userService.add(newUser)
-      return newUser
-   }
-   return user
-}
-
-async function signup(credentials, isGoogleLogin) {
+async function signup(credentials) {
    const saltRounds = 10
 
    logger.debug(

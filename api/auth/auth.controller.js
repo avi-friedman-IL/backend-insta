@@ -4,7 +4,7 @@ import { logger } from '../../services/logger.service.js'
 export async function login(req, res) {
    const credentials = req.body
    try {
-      const user = await authService.login(credentials, false)
+      const user = await authService.login(credentials)
       const loginToken = authService.getLoginToken(user)
 
       logger.info('User login: ', user)
@@ -17,36 +17,15 @@ export async function login(req, res) {
    }
 }
 
-export async function googleLogin(req, res) {
-   const { token } = req.body
-   try {
-        //  const user = await authService.googleLogin(token)
-        //  const userToSave = await authService.login(user.email, user.password, true)
-        //  const loginToken = authService.getLoginToken(userToSave)
-
-        //  logger.info('User login: ', userToSave)
-        //  res.cookie('loginToken', loginToken)
-        //  res.json(userToSave)
-      const user = await authService.googleLogin(token)
-      const loginToken = authService.getLoginToken(user)
-      res.cookie('loginToken', loginToken)
-      res.json(user)
-   } catch (err) {
-      logger.error('Failed to Login ' + err)
-      res.status(401).send({ err: 'Failed to Login' })
-   }
-}
-
 export async function signup(req, res) {
    try {
-      // const { email, password, fullname } = req.body
       const credentials = req.body
-      const account = await authService.signup(credentials, false)
+      const account = await authService.signup(credentials)
       logger.debug(
          `auth.route - new account created: ` + JSON.stringify(account)
       )
 
-      const user = await authService.login(credentials, false)
+      const user = await authService.login(credentials)
       const loginToken = authService.getLoginToken(user)
 
       res.cookie('loginToken', loginToken)

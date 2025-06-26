@@ -6,7 +6,6 @@ import { ObjectId } from 'mongodb'
 export const userService = {
    query,
    getById,
-   getByEmail,
    getByUsername,
    remove,
    update,
@@ -46,16 +45,7 @@ async function getById(userId) {
       throw err
    }
 }
-async function getByEmail(email) {
-   try {
-      const collection = await dbService.getCollection('user')
-      const user = await collection.findOne({ email })
-      return user
-   } catch (err) {
-      logger.error(`while finding user ${email}`, err)
-      throw err
-   }
-}
+
 
 async function getByUsername(username) {
    try {
@@ -117,9 +107,7 @@ async function update(user) {
 
 async function add(user) {
    try {
-      const existUser = user.isGoogleLogin
-         ? await getByEmail(user.email)
-         : await getByUsername(user.username)
+      const existUser = await getByUsername(user.username)
       if (existUser) throw new Error('Username taken')
 
       const userToAdd = {
