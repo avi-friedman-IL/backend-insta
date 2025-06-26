@@ -108,16 +108,6 @@ async function update(user) {
       const collection = await dbService.getCollection('user')
       await collection.updateOne({ _id: userToSave._id }, { $set: userToSave })
       
-      // יצירת קולקציות אוטומטית אם המגדר השתנה
-      if (oldGender !== newGender) {
-         try {
-            await dbService.createGenderCollectionsIfNotExist(newGender)
-         } catch (genderErr) {
-            logger.warn(`Failed to create gender collections for ${newGender}:`, genderErr)
-            // לא זורקים שגיאה כדי לא לחסום את עדכון המשתמש
-         }
-      }
-      
       return userToSave
    } catch (err) {
       logger.error(`cannot update user ${user._id}`, err)
@@ -146,14 +136,6 @@ async function add(user) {
       }
       const collection = await dbService.getCollection('user')
       await collection.insertOne(userToAdd)
-      
-      // יצירת קולקציות אוטומטית עבור המגדר של המשתמש החדש
-      try {
-         await dbService.createGenderCollectionsIfNotExist(userToAdd.gender)
-      } catch (genderErr) {
-         logger.warn(`Failed to create gender collections for ${userToAdd.gender}:`, genderErr)
-         // לא זורקים שגיאה כדי לא לחסום את יצירת המשתמש
-      }
       
       return userToAdd
    } catch (err) {
