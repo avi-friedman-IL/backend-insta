@@ -12,10 +12,10 @@ export const chatService = {
    aggregation,
 }
 
-async function query(filterBy = {}, gender = 'male') {
+async function query(filterBy = {}) {
    const criteria = _buildCriteria(filterBy)
    try {
-      const collection = await dbService.getGenderCollection('chat', gender)
+      const collection = await dbService.getCollection('chat')
       var chats = await collection.find(criteria).toArray()
       return chats
    } catch (err) {
@@ -24,9 +24,9 @@ async function query(filterBy = {}, gender = 'male') {
    }
 }
 
-async function getById(chatId, gender = 'male') {
+async function getById(chatId) {
    try {
-      const collection = await dbService.getGenderCollection('chat', gender)
+      const collection = await dbService.getCollection('chat')
       const chat = await collection.findOne({
          _id: ObjectId.createFromHexString(chatId),
       })
@@ -37,9 +37,9 @@ async function getById(chatId, gender = 'male') {
    }
 }
 
-async function add(chat, gender = 'male') {
+async function add(chat) {
    try {
-      const collection = await dbService.getGenderCollection('chat', gender)
+      const collection = await dbService.getCollection('chat')
       await collection.insertOne(chat)
       return chat
    } catch (err) {
@@ -48,9 +48,9 @@ async function add(chat, gender = 'male') {
    }
 }
 
-async function remove(chatId, gender = 'male') {
+async function remove(chatId) {
    try {
-      const collection = await dbService.getGenderCollection('chat', gender)
+      const collection = await dbService.getCollection('chat')
       await collection.deleteOne({ _id: ObjectId.createFromHexString(chatId) })
       socketService.broadcast({ type: 'chat-remove', data: chatId })
    } catch (err) {
@@ -59,11 +59,11 @@ async function remove(chatId, gender = 'male') {
    }
 }
 
-async function update(chat, gender = 'male') {
+async function update(chat) {
    try {
       const chatToSave = { ...chat }
       delete chatToSave._id
-      const collection = await dbService.getGenderCollection('chat', gender)
+      const collection = await dbService.getCollection('chat')
       await collection.updateOne(
          { _id: ObjectId.createFromHexString(chat._id) },
          { $set: chatToSave }
@@ -79,8 +79,8 @@ async function update(chat, gender = 'male') {
    }
 }
 
-async function aggregation(toUserId, gender = 'male') {
-   const collection = await dbService.getGenderCollection('chat', gender)
+async function aggregation(toUserId) {
+   const collection = await dbService.getCollection('chat')
    try {
       const pipeline = [
          {

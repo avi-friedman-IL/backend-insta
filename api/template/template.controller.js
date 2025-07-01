@@ -2,9 +2,8 @@ import { logger } from "../../services/logger.service.js"
 import { templateService } from "./template.service.js"
 
 export async function getTemplate(req, res) {
-    const gender = req.query.gender || req.user?.gender || 'male'
     try {
-        const template = await templateService.getById(req.params.id, gender)
+        const template = await templateService.getById(req.params.id)
         res.send(template)
     } catch (err) {
         logger.error('Failed to get template', err)
@@ -14,9 +13,8 @@ export async function getTemplate(req, res) {
 
 export async function getTemplates(req, res) {
     const filterBy = req.query
-    const gender = req.query.gender || req.user?.gender || 'male'
     try {
-        const templates = await templateService.query(filterBy, gender)
+        const templates = await templateService.query(filterBy)
         res.send(templates)
     } catch (err) {
         logger.error('Failed to get templates', err)
@@ -25,9 +23,8 @@ export async function getTemplates(req, res) {
 }
 
 export async function deleteTemplate(req, res) {
-    const gender = req.query.gender || req.user?.gender || 'male'
     try {
-        await templateService.remove(req.params.id, gender)
+        await templateService.remove(req.params.id)
         res.send({ template: 'Deleted successfully' })
     } catch (err) {
         logger.error('Failed to delete template', err)
@@ -36,10 +33,9 @@ export async function deleteTemplate(req, res) {
 }
 
 export async function updateTemplate(req, res) {
-    const gender = req.query.gender || req.user?.gender || 'male'
     try {
         const template = req.body
-        const savedTemplate = await templateService.update(template, gender)
+        const savedTemplate = await templateService.update(template)
         res.send(savedTemplate)
     } catch (err) {
         logger.error('Failed to update template', err)
@@ -48,10 +44,9 @@ export async function updateTemplate(req, res) {
 }
 
 export async function addTemplate(req, res) {
-    const gender = req.query.gender || req.user?.gender || 'male'
     try {
         const template = req.body
-        const savedTemplate = await templateService.add(template, gender)
+        const savedTemplate = await templateService.add(template)
         res.json(savedTemplate)
     } catch (err) {
         logger.error('Failed to add template', err)

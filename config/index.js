@@ -11,16 +11,3 @@ if (process.env.NODE_ENV === 'production') {
 
 // הגדרות כלליות
 config.isGuestMode = true
-
-// הגדרות מגדר
-config.gender = {
-    default: 'male',
-    supported: ['male', 'female'],
-    collections: ['script', 'template', 'objection', 'training', 'msg', 'chat']
-}
-
-// הגדרות נוספות
-config.features = {
-    genderSeparation: true,
-    multiGenderSupport: true
-}

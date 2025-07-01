@@ -3,9 +3,8 @@ import { objectionService } from './objection.service.js'
 
 export async function getObjections(req, res) {
     const filterBy = req.query
-    const gender = req.query.gender || req.user?.gender || 'male'
     try {
-        const objections = await objectionService.query(filterBy, gender)
+        const objections = await objectionService.query(filterBy)
         res.send(objections)
     } catch (err) {
         logger.error('Failed to get objections', err)
@@ -14,9 +13,8 @@ export async function getObjections(req, res) {
 }
 
 export async function getObjection(req, res) {
-    const gender = req.query.gender || req.user?.gender || 'male'
     try {
-        const objection = await objectionService.getById(req.params.id, gender)
+        const objection = await objectionService.getById(req.params.id)
         res.send(objection)
     } catch (err) {
         logger.error('Failed to get objection', err)
@@ -25,9 +23,8 @@ export async function getObjection(req, res) {
 }
 
 export async function deleteObjection(req, res) {
-    const gender = req.query.gender || req.user?.gender || 'male'
     try {
-        await objectionService.remove(req.params.id, gender)
+        await objectionService.remove(req.params.id)
         res.send({ msg: 'Deleted successfully' })
     } catch (err) {
         logger.error('Failed to delete objection', err)
@@ -36,10 +33,9 @@ export async function deleteObjection(req, res) {
 }
 
 export async function updateObjection(req, res) {
-    const gender = req.query.gender || req.user?.gender || 'male'
     try {
         const objection = req.body
-        const savedObjection = await objectionService.update(objection, gender)
+        const savedObjection = await objectionService.update(objection)
         res.send(savedObjection)
     } catch (err) {
         logger.error('Failed to update objection', err)
@@ -48,10 +44,9 @@ export async function updateObjection(req, res) {
 }
 
 export async function addObjection(req, res) {
-    const gender = req.query.gender || req.user?.gender || 'male'
     try {
         const objection = req.body
-        const savedObjection = await objectionService.add(objection, gender)
+        const savedObjection = await objectionService.add(objection)
         res.json(savedObjection)
     } catch (err) {
         logger.error('Failed to add objection', err)

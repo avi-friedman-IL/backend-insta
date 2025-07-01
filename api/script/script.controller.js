@@ -3,9 +3,8 @@ import { scriptService } from './script.service.js'
 
 export async function getScripts(req, res) {
     const filterBy = req.query
-    const gender = req.query.gender || req.user?.gender || 'male'
     try {
-        const scripts = await scriptService.query(filterBy, gender)
+        const scripts = await scriptService.query(filterBy)
         res.send(scripts)
     } catch (err) {
         logger.error('Failed to get scripts', err)
@@ -14,9 +13,8 @@ export async function getScripts(req, res) {
 }
 
 export async function getScript(req, res) {
-    const gender = req.query.gender || req.user?.gender || 'male'
     try {
-        const script = await scriptService.getById(req.params.id, gender)
+        const script = await scriptService.getById(req.params.id)
         res.send(script)
     } catch (err) {
         logger.error('Failed to get script', err)
@@ -25,9 +23,8 @@ export async function getScript(req, res) {
 }
 
 export async function deleteScript(req, res) {
-    const gender = req.query.gender || req.user?.gender || 'male'
     try {
-        await scriptService.remove(req.params.id, gender)
+        await scriptService.remove(req.params.id)
         res.send({ msg: 'Deleted successfully' })
     } catch (err) {
         logger.error('Failed to delete script', err)
@@ -36,10 +33,9 @@ export async function deleteScript(req, res) {
 }
 
 export async function updateScript(req, res) {
-    const gender = req.query.gender || req.user?.gender || 'male'
     try {
         const script = req.body
-        const savedScript = await scriptService.update(script, gender)
+        const savedScript = await scriptService.update(script)
         res.send(savedScript)
     } catch (err) {
         logger.error('Failed to update script', err)
@@ -48,10 +44,9 @@ export async function updateScript(req, res) {
 }
 
 export async function addScript(req, res) {
-    const gender = req.query.gender || req.user?.gender || 'male'
     try {
         const script = req.body
-        const savedScript = await scriptService.add(script, gender)
+        const savedScript = await scriptService.add(script)
         res.json(savedScript)
     } catch (err) {
         logger.error('Failed to add script', err)
