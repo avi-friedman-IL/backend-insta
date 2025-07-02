@@ -12,12 +12,12 @@ export const trainingService = {
 }
 
 async function query(filterBy = {}) {
-   const { criteria, sortOptions } = _buildCriteria(filterBy)
+   const criteria = _buildCriteria(filterBy)
    try {
       const collection = await dbService.getCollection('training')
       var trainings = await collection
          .find(criteria)
-         .sort(sortOptions)
+         .sort({ createdAt: -1 })
          .toArray()
       return trainings
    } catch (err) {
@@ -83,42 +83,6 @@ async function update(training) {
 
 function _buildCriteria(filterBy) {
    const criteria = {}
-   let sortOptions = { createdAt: -1 } // default sort
-   if (filterBy.userId) {
-      if (!filterBy.isAdmin || filterBy.isAdmin === 'false' && !filterBy.isTeamManager || filterBy.isTeamManager === 'false') {
-         criteria.from = filterBy.userId
-      }
-   }
-   if (filterBy.text) {
-      const textPattern = filterBy.text.trim()
-      criteria.$or = [
-         { fromName: { $regex: textPattern, $options: 'i' } },
-         { subject: { $regex: textPattern, $options: 'i' } },
-         { content: { $regex: textPattern, $options: 'i' } },
-      ]
-   }
-
-   if (filterBy.subject) {
-      criteria.subject = { $regex: filterBy.subject, $options: 'i' }
-   }
-
-   if (filterBy.isDone === 'true') {
-      criteria.isDone = true
-   } else if (filterBy.isDone === 'false') {
-      criteria.isDone = false
-   }
-
-   if (filterBy.sortBy) {
-      if (filterBy.sortBy === 'date') {
-         sortOptions = { createdAt: -1 }
-      } else if (filterBy.sortBy === 'name') {
-         sortOptions = { fromName: 1 }
-      } else if (filterBy.sortBy === 'subject') {
-         sortOptions = { subject: 1 }
-      }
-   }
-
-   console.log('criteria:', criteria)
-   console.log('sortOptions:', sortOptions)
-   return { criteria, sortOptions }
+   if (filterBy.gender) criteria.gender = filterBy.gender
+   return criteria
 }

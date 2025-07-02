@@ -71,5 +71,6 @@ async function add(script) {
 
 function _buildCriteria(filterBy) {
    const criteria = {}
+   if (filterBy.gender) criteria.gender = filterBy.gender
    return criteria
 }
