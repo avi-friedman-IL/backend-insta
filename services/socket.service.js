@@ -1,118 +1,29 @@
 import dotenv from 'dotenv'
 dotenv.config()
 import { Server } from 'socket.io'
-import cloudinary from 'cloudinary'
 
-import { chatService } from '../api/chat/chat.service.js'
 import { msgService } from '../api/msg/msg.service.js'
 import { userService } from '../api/user/user.service.js'
 import { logger } from './logger.service.js'
 
 var gIo = null
 
-cloudinary.v2.config({
-   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-   api_key: process.env.CLOUDINARY_API_KEY,
-   api_secret: process.env.CLOUDINARY_API_SECRET,
-})
-
-// פונקציה להעלאת קובץ לענן
-async function uploadFileToCloudinary(file) {
-   try {
-      if (!file || !file.data) return null
-
-      const base64Data = file.data.split(',')[1]
-      const buffer = Buffer.from(base64Data, 'base64')
-      const fileName = `${Date.now()}-${file.name.replace(
-         /[^A-Za-z0-9.]/g,
-         '_'
-      )}`
-
-      // בדיקה אם זה קובץ PDF ושינוי הפרמטרים בהתאם
-      const isExcel = /\.(xlsx|xls|csv)$/i.test(file.name)
-      const isPDF = file.name.toLowerCase().endsWith('.pdf')
-
-      const uploadResult = await new Promise((resolve, reject) => {
-         cloudinary.v2.uploader
-            .upload_stream(
-               {
-                  public_id: fileName,
-                  resource_type: isExcel ? 'raw' : 'auto',
-                  ...(isPDF ? { format: 'pdf', pages: true } : {}),
-                  // Add production-specific settings
-                  quality: 'auto',
-                  fetch_format: 'auto',
-                  flags: 'attachment',
-                  transformation: [
-                     { fetch_format: 'auto' },
-                     { quality: 'auto' },
-                     { flags: 'attachment' }
-                  ]
-               },
-               (error, result) => {
-                  if (error) reject(error)
-                  else resolve(result)
-               }
-            )
-            .end(buffer)
-      })
-
-      if (!uploadResult || !uploadResult.secure_url) {
-         logger.error('Uploaded file URL is not valid')
-         return null
-      }
-
-      const fileInfo = {
-         url: uploadResult.secure_url,
-         originalName: file.name,
-         type:
-            uploadResult.resource_type === 'image'
-               ? `image/${uploadResult.format}`
-               : file.type || 'application/octet-stream',
-         format: uploadResult.format || '',
-         size: file.size || 0,
-      }
-
-      // יצירת URL להורדה וצפייה
-      if (isPDF) {
-         fileInfo.viewUrl = fileInfo.url
-         fileInfo.downloadUrl = `${fileInfo.url.replace(
-            '/upload/',
-            '/upload/fl_attachment,fl_force_download/'
-         )}`
-      } else {
-         fileInfo.viewUrl = fileInfo.url
-         fileInfo.downloadUrl = `${fileInfo.url.replace(
-            '/upload/',
-            '/upload/fl_attachment,fl_force_download/'
-         )}`
-      }
-
-      logger.info(`File uploaded successfully: ${fileInfo.url}`)
-      logger.info(`File type: ${fileInfo.type}, format: ${fileInfo.format}`)
-      logger.info(`View URL: ${fileInfo.viewUrl}`)
-      logger.info(`Download URL: ${fileInfo.downloadUrl}`)
-
-      return fileInfo
-   } catch (error) {
-      logger.error('Error uploading file to Cloudinary:', error)
-      return null
-   }
-}
-
 export function setupSocketAPI(http) {
    gIo = new Server(http, {
       cors: {
          origin: '*',
       },
-      maxHttpBufferSize: 1e8,
    })
-   // Handling new socket connections
-   gIo.on('connect', socket => {
-      logger.info(`New connected socket [id: ${socket.id}]`)
-
+   gIo.on('connection', socket => {
+      logger.info('Client connected')
       socket.on('disconnect', () => {
-         logger.info(`Socket [id: ${socket.id}] disconnected`)
+         logger.info('Client disconnected')
+      })
+
+      socket.on('set-user-socket', userId => {
+         socket.userId = userId
+      })
+      socket.on('unset-user-socket', () => {
          delete socket.userId
       })
 
@@ -142,48 +53,11 @@ export function setupSocketAPI(http) {
          _printSockets()
       })
 
-      socket.on('login', userId => {
-         socket.userId = userId
-         gIo.emit('login', userId)
-         logger.info(`Socket ${socket.id} logged in with userId: ${userId}`)
-      })
-
-      socket.on('chat-add', async chat => {
-         try {
-            // טיפול בקובץ מצורף אם קיים
-            if (chat.file && chat.file.data) {
-               const fileInfo = await uploadFileToCloudinary(chat.file)
-               if (fileInfo) {
-                  chat.file = { ...chat.file, ...fileInfo }
-               }
-            }
-
-            const toUserSocket = await _getUserSocket(chat.toUserId)
-            const fromUserSocket = await _getUserSocket(chat.fromUserId)
-
-            if (chat.toGroupId) {
-               socket.join(`group:${chat.toGroupId}`)
-               gIo.to(`group:${chat.toGroupId}`).emit('chat-add', chat)
-               logger.info(`Emitting chat to group:${chat.toGroupId}`)
-            } else {
-               if (!toUserSocket && !fromUserSocket) return
-               if (chat.toUserId === chat.fromUserId) {
-                  // Handle self messages
-                  if (fromUserSocket) {
-                     fromUserSocket.emit('chat-add', chat)
-                  }
-               } else if (toUserSocket) {
-                  toUserSocket.emit('chat-add', chat)
-               }
-               if (fromUserSocket) {
-                  fromUserSocket.emit('chat-add', chat)
-               }
-            }
-            chatService.add(chat)
-         } catch (err) {
-            logger.error(`Error handling chat-add: ${err}`)
-         }
-      })
+      // socket.on('login', userId => {
+      //    socket.userId = userId
+      //    gIo.emit('login', userId)
+      //    logger.info(`Socket ${socket.id} logged in with userId: ${userId}`)
+      // })
 
       socket.on('msg-add', async msg => {
          gIo.emit('msg-add', msg)
@@ -211,26 +85,24 @@ function emitTo({ type, data, label }) {
 }
 
 // Emit an event to a specific user
-async function emitToUser({ type, data, userId }) {
+async function emitToUser(type, data, userId) {
    userId = userId.toString()
-   const socket = await _getUserSocket(userId)
-   if (socket) {
-      logger.info(
-         `Emitting event: ${type} to user: ${userId} socket [id: ${socket.id}]`
-      )
-      socket.emit(type, data)
-   } else {
-      logger.info(`No active socket for user: ${userId}`)
-   }
+  const socket = await _getUserSocket(userId)
+  if (socket) {
+     socket.emit(type, data)
+     logger.info(`Emitted to user ${userId}`)
+  } else {
+     logger.info(`No socket found for user ${userId}`)
+  }
 }
+
 
 // Broadcast an event to a room or all users, excluding a specific user if needed
 async function broadcast({ type, data, room = null, userId }) {
-   userId ? (userId = userId.toString()) : null
+   userId = userId.toString()
+
    logger.info(`Broadcasting event: ${type}`)
    const excludedSocket = await _getUserSocket(userId)
-   // const excludedSocket = null
-
    if (room && excludedSocket) {
       logger.info(`Broadcast to room ${room} excluding user: ${userId}`)
       excludedSocket.broadcast.to(room).emit(type, data)
@@ -251,21 +123,13 @@ async function broadcast({ type, data, room = null, userId }) {
 // Get the socket of a specific user
 async function _getUserSocket(userId) {
    const sockets = await _getAllSockets()
-   // console.log(
-   //    'All sockets:',
-   //    sockets.map(s => ({ id: s.id, userId: s.userId }))
-   // )
-
-   const socket = sockets.find(s => s.userId === userId)
-   socket
-      ? _printSocket(socket)
-      : console.log(`No socket found for userId: ${userId}`)
+   const socket = sockets.find(socket => socket.userId === userId)
    return socket
 }
 
-// Get all active sockets
 async function _getAllSockets() {
-   return await gIo.fetchSockets()
+   const sockets = await gIo.fetchSockets()
+   return sockets
 }
 
 // Print details of all active sockets

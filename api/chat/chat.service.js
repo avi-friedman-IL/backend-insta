@@ -1,7 +1,6 @@
 import { ObjectId } from 'mongodb'
 import { dbService } from '../../services/db.service.js'
 import { logger } from '../../services/logger.service.js'
-import { socketService } from '../../services/socket.service.js'
 
 export const chatService = {
    query,
@@ -9,116 +8,79 @@ export const chatService = {
    add,
    remove,
    update,
-   aggregation,
 }
-
-async function query(filterBy = {}) {
+async function query(filterBy) {
+   if (!filterBy.userId) return []
    const criteria = _buildCriteria(filterBy)
    try {
       const collection = await dbService.getCollection('chat')
-      var chats = await collection.find(criteria).toArray()
+      const chats = await collection.find(criteria).sort({ 'msgs.createdAt': -1 }).toArray()
       return chats
    } catch (err) {
-      logger.error('cannot find chats', err)
+      console.error('Cannot find chats', err)
       throw err
    }
 }
 
 async function getById(chatId) {
-   try {
-      const collection = await dbService.getCollection('chat')
-      const chat = await collection.findOne({
-         _id: ObjectId.createFromHexString(chatId),
-      })
-      return chat
-   } catch (err) {
-      logger.error(`while finding chat ${chatId}`, err)
-      throw err
-   }
-}
-
-async function add(chat) {
-   try {
-      const collection = await dbService.getCollection('chat')
-      await collection.insertOne(chat)
-      return chat
-   } catch (err) {
-      logger.error('cannot insert chat', err)
-      throw err
-   }
-}
-
-async function remove(chatId) {
-   try {
-      const collection = await dbService.getCollection('chat')
-      await collection.deleteOne({ _id: ObjectId.createFromHexString(chatId) })
-      socketService.broadcast({ type: 'chat-remove', data: chatId })
-   } catch (err) {
-      logger.error(`cannot remove chat ${chatId}`, err)
-      throw err
-   }
-}
-
-async function update(chat) {
-   try {
-      const chatToSave = { ...chat }
-      delete chatToSave._id
-      const collection = await dbService.getCollection('chat')
-      await collection.updateOne(
-         { _id: ObjectId.createFromHexString(chat._id) },
-         { $set: chatToSave }
-      )
-      socketService.broadcast({
-         type: 'chat-update',
-         data: chat,
-      })
-      return chat
-   } catch (err) {
-      logger.error('cannot update chat', err)
-      throw err
-   }
-}
-
-async function aggregation(toUserId) {
-   const collection = await dbService.getCollection('chat')
-   try {
-      const pipeline = [
-         {
-            $match: {
-               toUserId: toUserId,
-            },
-         },
-         {
-            $group: {
-               _id: '$toUserId',
-               fromUserId: { $push: '$fromUserId' },
-               msg: { $push: '$msg' },
-               createdAt: { $push: '$createdAt' },
-            },
-         },
-      ]
-      const aggResult = await collection.aggregate(pipeline).toArray()
-      console.log('aggResult:', aggResult)
-      return aggResult
-   } catch (err) {
-      logger.error('aggregation error', err)
-      throw err
-   }
-}
-
-function _buildCriteria(filterBy) {
-   const { toUserId, fromUserId, toGroupId } = filterBy
-   if (toUserId) {
-      return {
-         $or: [
-            { toUserId, fromUserId },
-            { toUserId: fromUserId, fromUserId: toUserId },
-         ],
-      }
-   }
-   if (toGroupId) {
-      return { toGroupId }
-   }
-   const criteria = {}
-   return criteria
-}
+    try {
+       const collection = await dbService.getCollection('chat')
+       const chat = await collection.findOne({
+          _id: ObjectId.createFromHexString(chatId),
+       })
+       return chat
+    } catch (err) {
+       logger.error(`while finding chat ${chatId}`, err)
+       throw err
+    }
+ }
+ 
+ async function add(chat) {
+    try {
+       const collection = await dbService.getCollection('chat')
+       await collection.insertOne(chat)
+       return chat
+    } catch (err) {
+       logger.error('cannot insert chat', err)
+       throw err
+    }
+ }
+ 
+ async function remove(chatId) {
+    try {
+       const collection = await dbService.getCollection('chat')
+       await collection.deleteOne({ _id: ObjectId.createFromHexString(chatId) })
+    } catch (err) {
+       logger.error(`cannot remove chat ${chatId}`, err)
+       throw err
+    }
+ }
+ 
+ async function update(chat) {
+    try {
+       const chatToSave = { ...chat }
+       delete chatToSave._id
+       const collection = await dbService.getCollection('chat')
+       await collection.updateOne(
+          { _id: ObjectId.createFromHexString(chat._id) },
+          { $set: chatToSave }
+       )
+       return chat
+    } catch (err) {
+       logger.error('cannot update chat', err)
+       throw err
+    }
+ }
+ 
+ function _buildCriteria(filterBy) {
+    const criteria = {}
+    if (filterBy.userId) {
+      const {userId} = filterBy
+        criteria.$or = [
+            { toId: userId },
+            { ownerId: userId },
+            { 'groupUsers._id': userId }
+        ]
+    }
+    return criteria
+ }

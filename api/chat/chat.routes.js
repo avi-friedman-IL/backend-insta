@@ -1,14 +1,12 @@
-import express from 'express';
+import express from 'express'
+import { getChats, getChatById, addChat, updateChat, deleteChat } from './chat.controller.js';
 import { requireAuth } from '../../middlewares/requireAuth.middleware.js';
-import { getChat, getChats, addChat, deleteChat, updateChat } from './chat.controller.js';
 
-export const chatRoutes = express.Router();
+export const chatRoutes = express.Router()
 
-// middleware that is specific to this router
-chatRoutes.use(requireAuth);
+chatRoutes.get('/', requireAuth, getChats)
+chatRoutes.get('/:id', requireAuth, getChatById)
+chatRoutes.post('/', requireAuth, addChat)
+chatRoutes.put('/:id', requireAuth, updateChat)
+chatRoutes.delete('/:id', requireAuth, deleteChat)
 
-chatRoutes.get('/', getChats);
-chatRoutes.get('/:id', getChat);
-chatRoutes.post('/', addChat);
-chatRoutes.put('/:id', updateChat);
-chatRoutes.delete('/:id', deleteChat);
