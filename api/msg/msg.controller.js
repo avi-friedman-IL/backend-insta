@@ -1,5 +1,6 @@
 import { logger } from "../../services/logger.service.js"
 import { msgService } from "./msg.service.js"
+import { socketService } from "../../services/socket.service.js"
 
 export async function getMsg(req, res) {
     try {
@@ -23,8 +24,10 @@ export async function getMsgs(req, res) {
 }
 
 export async function deleteMsg(req, res) {
+    const { loggedinUser } = req
     try {
         await msgService.remove(req.params.id)
+        socketService.broadcast({ type: 'msg-removed', data: req.params.id, userId: loggedinUser._id })
         res.send({ msg: 'Deleted successfully' })
     } catch (err) {
         logger.error('Failed to delete msg', err)
@@ -33,9 +36,11 @@ export async function deleteMsg(req, res) {
 }
 
 export async function updateMsg(req, res) {
+    const { loggedinUser } = req
     try {
         const msg = req.body
         const savedMsg = await msgService.update(msg)
+        socketService.broadcast({ type: 'msg-updated', data: savedMsg, userId: loggedinUser._id })
         res.send(savedMsg)
     } catch (err) {
         logger.error('Failed to update msg', err)
@@ -44,9 +49,11 @@ export async function updateMsg(req, res) {
 }
 
 export async function addMsg(req, res) {
+    const { loggedinUser } = req
     try {
         const msg = req.body
         const savedMsg = await msgService.add(msg)
+        socketService.broadcast({ type: 'msg-added', data: savedMsg, userId: loggedinUser._id })
         res.json(savedMsg)
     } catch (err) {
         logger.error('Failed to add msg', err)

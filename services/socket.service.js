@@ -59,17 +59,17 @@ export function setupSocketAPI(http) {
       //    logger.info(`Socket ${socket.id} logged in with userId: ${userId}`)
       // })
 
-      socket.on('msg-add', async msg => {
-         gIo.emit('msg-add', msg)
-         msgService.add(msg)
-         logger.info(`Emitting msg to all users`)
-      })
+      // socket.on('msg-add', async msg => {
+      //    gIo.emit('msg-add', msg)
+      //    msgService.add(msg)
+      //    logger.info(`Emitting msg to all users`)
+      // })
 
-      socket.on('msg-update', async msg => {
-         gIo.emit('msg-update', msg)
-         msgService.update(msg)
-         logger.info(`Emitting msg-update to all users`)
-      })
+      // socket.on('msg-update', async msg => {
+      //    gIo.emit('msg-update', msg)
+      //    msgService.update(msg)
+      //    logger.info(`Emitting msg-update to all users`)
+      // })
 
       socket.on('on-respected-msg', async ({ userName, amount }) => {
          gIo.emit('on-respected-msg', { userName, amount })

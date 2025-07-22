@@ -1,7 +1,6 @@
 import { ObjectId } from 'mongodb'
 import { dbService } from '../../services/db.service.js'
 import { logger } from '../../services/logger.service.js'
-import { socketService } from '../../services/socket.service.js'
 
 export const msgService = {
    query,
@@ -54,7 +53,6 @@ async function remove(msgId) {
    try {
       const collection = await dbService.getCollection('msg')
       await collection.deleteOne({ _id: ObjectId.createFromHexString(msgId) })
-      socketService.broadcast({ type: 'msg-remove', data: msgId })
    } catch (err) {
       logger.error(`cannot remove msg ${msgId}`, err)
       throw err
@@ -70,10 +68,6 @@ async function update(msg) {
          { _id: ObjectId.createFromHexString(msg._id) },
          { $set: msgToSave }
       )
-      socketService.broadcast({
-         type: 'msg-update',
-         data: msg,
-      })
       return msg
    } catch (err) {
       logger.error('cannot update msg', err)
@@ -118,7 +112,5 @@ function _buildCriteria(filterBy) {
       }
    }
 
-   console.log('criteria:', criteria)
-   console.log('sortOptions:', sortOptions)
    return { criteria, sortOptions }
 }
